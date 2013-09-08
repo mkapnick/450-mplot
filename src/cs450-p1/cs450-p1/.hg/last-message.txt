@@ -1,0 +1,1 @@
+Added minimum functionality to algorithm, need to implement reading from the TGA file
