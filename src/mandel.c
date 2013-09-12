@@ -10,10 +10,12 @@
 #include "tga.h"
 #define __INCLUDE_MANDEL_ARRAY__
 #include "mplot.h"
+#include <inttypes.h>
 
 /* You can tweak this parameter if you wish, but you should not need to. */
 const int NUM_ITERATIONS = 500;
 const int TEST_CASE_MAX_INDEX = 4;
+char * outputName;
 
 
 /* The main entry point into the Mandelbrot set calculation. The parameters
@@ -27,12 +29,14 @@ void
 run_test_case (char * output, uint8_t testcase, uint8_t pthreads)
 {
     double testArray[4];
+    outputName = output;
     
-    if(testcase == -1)
+    if((int)testcase == 100)
     {
         //run all test cases
+        
     }
-    else if (testcase < TEST_CASE_MAX_INDEX && testcase >=0)
+    else if (testcase < TEST_CASE_MAX_INDEX)
     {
         int i;
         //initialize array
@@ -40,7 +44,6 @@ run_test_case (char * output, uint8_t testcase, uint8_t pthreads)
         {
             testArray[i] = testcases[testcase][i];
         }
-        printf("here");
         determineMandelBrotSet(testArray);
     }
     else
@@ -54,17 +57,18 @@ run_test_case (char * output, uint8_t testcase, uint8_t pthreads)
 
 void determineMandelBrotSet(double testArray [])
 {
-
     uint8_t pixels[HEIGHT][WIDTH][3];
     
-    uint8_t color;
+    uint16_t color;
     uint8_t blue;
     uint8_t green;
     uint8_t red;
     
-    int ok;
+    int i =0;
+    int j =0;
+    int k =0;
+    
     int xMax;
-    int j;
     int height;
     int width;
     
@@ -76,91 +80,60 @@ void determineMandelBrotSet(double testArray [])
     double b;
     double newa;
     double newb;
-    
-    ok = 1;
+
+    color = 0; //should this be 0?
     xMax = 1;
     height = 0;
     width = 0;
-    x = -0.149167; //testArray[0]
-    y = 0.850833;  //testArray[1]
+    
+    x =  testArray[0];
+    y = testArray[1];
     endx = testArray[2];
     endy = testArray[3];
+    
     a = 0;
     b = 0;
     newa = 0;
     newb = 0;
+    int count = 0;
     
     double incrementX = x + ((endx - x) / HEIGHT);
     double incrementY = y + ((endy - y) / WIDTH);
-
-    while (ok)
-    {
-        for (j =0; j < NUM_ITERATIONS; j++)
-        {
-            newa = a * a - b * b + x;
-            newb = 2 * a * b + y;
-            a=newa;
-            b=newb;
-            
-            if((a*a) + (b*b) > 100)
-            {
-                printf("a^2 + b^2 is > 100\n");
-                
-                if (j < 50)
-                    color = j + 50;
-                else if (j < 100)
-                    color = j + 55;
-                else if (j < 350)
-                    color = j + 80;
-                
-                blue = ((double)color / (double)NUM_ITERATIONS * 180);
-                green = ((double) color / (double) NUM_ITERATIONS * 255);
-                red = ((double)color / (double) NUM_ITERATIONS * 120);
-                
-                printf("B: %x\n", blue);
-                printf("G: %x\n",green);
-                printf("R: %x\n",red);
-                
-                pixels[height][width][0] = blue; //blue
-                pixels[height][width][1] = green; //green
-                pixels[height][width][2] = red; //red
-            }
-            else
-            {                
-                pixels[height][width][0] = 230; //blue
-                pixels[height][width][1] = 50; //green
-                pixels[height][width][2] = 70; //red
-            }
-        }
     
-        j = 0;
-        a = 0;
-        b = 0;
-        
-        if( x <= endx && xMax)
+    for (i=0; i < HEIGHT; i++)
+    {
+        for (j =0; j < WIDTH; j++)
         {
-            x += incrementX;
-            height ++;
+            for (k =0; k < NUM_ITERATIONS && a*a+b*b < 100; k++)
+            {
+                count++;
+                newa = a * a - b * b + x;
+                newb = 2 * a * b + y;
+                a=newa;
+                b=newb;
+            }
+            //calculate the color
+            blue = (color / NUM_ITERATIONS * 180);
+            green = ( color / NUM_ITERATIONS * 255);
+            red = (color /  NUM_ITERATIONS * 120);
+            
+            pixels[i][j][0] = blue;
+            pixels[i][j][1] = green;
+            pixels[i][j][2] = red;
+            
+            if(i == 700 && j == 700)
+            {
+                printf("in if\n");
+                printf("%" PRIu8 "\n", blue );
+                printf("%" PRIu8 "\n", pixels[700][700][0] );
+            }
+            a=0;
+            b=0;
+            y += incrementY;
         }
-        else if (y <= endy)
-        {
-            xMax = 0;
-            x = testArray[0];
-            y+=incrementY;
-            width++;
-        }
-        else
-        {
-            //write to the tga file
-            ok = 0;
-        }
+        x += incrementX;
     }
-    printf("finished");
-}
-
-void writeToTGAFile(uint8_t *** pixels)
-{
-    FILE *fp;
-    fp = fopen("test.bin", "wb");
-    //fwrite
+    
+    printf("%i\n",count);
+    write_file(outputName, (uint8_t *) &pixels);
 }

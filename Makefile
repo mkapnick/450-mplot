@@ -59,10 +59,10 @@ am__make_running_with_option = \
   test $$has_opt = yes
 am__make_dryrun = (target_option=n; $(am__make_running_with_option))
 am__make_keepgoing = (target_option=k; $(am__make_running_with_option))
-pkgdatadir = $(datadir)/program
-pkgincludedir = $(includedir)/program
-pkglibdir = $(libdir)/program
-pkglibexecdir = $(libexecdir)/program
+pkgdatadir = $(datadir)/mplot
+pkgincludedir = $(includedir)/mplot
+pkglibdir = $(libdir)/mplot
+pkglibexecdir = $(libexecdir)/mplot
 am__cd = CDPATH="$${ZSH_VERSION+.}$(PATH_SEPARATOR)" && cd
 install_sh_DATA = $(install_sh) -c -m 644
 install_sh_PROGRAM = $(install_sh) -c
@@ -78,7 +78,8 @@ POST_UNINSTALL = :
 subdir = .
 DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
 	$(top_srcdir)/configure $(am__configure_deps) AUTHORS COPYING \
-	ChangeLog INSTALL NEWS README compile install-sh missing
+	ChangeLog INSTALL NEWS README compile depcomp install-sh \
+	missing
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
@@ -198,7 +199,7 @@ CCDEPMODE = depmode=gcc3
 CFLAGS = -g -O2
 CPPFLAGS = 
 CYGPATH_W = echo
-DEFS = -DPACKAGE_NAME=\"program\" -DPACKAGE_TARNAME=\"program\" -DPACKAGE_VERSION=\"1.0\" -DPACKAGE_STRING=\"program\ 1.0\" -DPACKAGE_BUGREPORT=\"\" -DPACKAGE_URL=\"\" -DPACKAGE=\"program\" -DVERSION=\"1.0\"
+DEFS = -DPACKAGE_NAME=\"mplot\" -DPACKAGE_TARNAME=\"mplot\" -DPACKAGE_VERSION=\"1.0\" -DPACKAGE_STRING=\"mplot\ 1.0\" -DPACKAGE_BUGREPORT=\"\" -DPACKAGE_URL=\"\" -DPACKAGE=\"mplot\" -DVERSION=\"1.0\"
 DEPDIR = .deps
 ECHO_C = \c
 ECHO_N = 
@@ -216,11 +217,11 @@ LTLIBOBJS =
 MAKEINFO = ${SHELL} /Users/michaelk18/Academics/CS_450/450_p1/450_p1/missing makeinfo
 MKDIR_P = ./install-sh -c -d
 OBJEXT = o
-PACKAGE = program
+PACKAGE = mplot
 PACKAGE_BUGREPORT = 
-PACKAGE_NAME = program
-PACKAGE_STRING = program 1.0
-PACKAGE_TARNAME = program
+PACKAGE_NAME = mplot
+PACKAGE_STRING = mplot 1.0
+PACKAGE_TARNAME = mplot
 PACKAGE_URL = 
 PACKAGE_VERSION = 1.0
 PATH_SEPARATOR = :

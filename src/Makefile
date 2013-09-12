@@ -60,10 +60,10 @@ am__make_running_with_option = \
   test $$has_opt = yes
 am__make_dryrun = (target_option=n; $(am__make_running_with_option))
 am__make_keepgoing = (target_option=k; $(am__make_running_with_option))
-pkgdatadir = $(datadir)/program
-pkgincludedir = $(includedir)/program
-pkglibdir = $(libdir)/program
-pkglibexecdir = $(libexecdir)/program
+pkgdatadir = $(datadir)/mplot
+pkgincludedir = $(includedir)/mplot
+pkglibdir = $(libdir)/mplot
+pkglibexecdir = $(libexecdir)/mplot
 am__cd = CDPATH="$${ZSH_VERSION+.}$(PATH_SEPARATOR)" && cd
 install_sh_DATA = $(install_sh) -c -m 644
 install_sh_PROGRAM = $(install_sh) -c
@@ -89,7 +89,7 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
-am_mplot_OBJECTS = mplot.$(OBJEXT)
+am_mplot_OBJECTS = mplot.$(OBJEXT) mandel.$(OBJEXT) tga.$(OBJEXT)
 mplot_OBJECTS = $(am_mplot_OBJECTS)
 mplot_LDADD = $(LDADD)
 AM_V_P = $(am__v_P_$(V))
@@ -159,7 +159,7 @@ CCDEPMODE = depmode=gcc3
 CFLAGS = -g -O2
 CPPFLAGS = 
 CYGPATH_W = echo
-DEFS = -DPACKAGE_NAME=\"program\" -DPACKAGE_TARNAME=\"program\" -DPACKAGE_VERSION=\"1.0\" -DPACKAGE_STRING=\"program\ 1.0\" -DPACKAGE_BUGREPORT=\"\" -DPACKAGE_URL=\"\" -DPACKAGE=\"program\" -DVERSION=\"1.0\"
+DEFS = -DPACKAGE_NAME=\"mplot\" -DPACKAGE_TARNAME=\"mplot\" -DPACKAGE_VERSION=\"1.0\" -DPACKAGE_STRING=\"mplot\ 1.0\" -DPACKAGE_BUGREPORT=\"\" -DPACKAGE_URL=\"\" -DPACKAGE=\"mplot\" -DVERSION=\"1.0\"
 DEPDIR = .deps
 ECHO_C = \c
 ECHO_N = 
@@ -177,11 +177,11 @@ LTLIBOBJS =
 MAKEINFO = ${SHELL} /Users/michaelk18/Academics/CS_450/450_p1/450_p1/missing makeinfo
 MKDIR_P = .././install-sh -c -d
 OBJEXT = o
-PACKAGE = program
+PACKAGE = mplot
 PACKAGE_BUGREPORT = 
-PACKAGE_NAME = program
-PACKAGE_STRING = program 1.0
-PACKAGE_TARNAME = program
+PACKAGE_NAME = mplot
+PACKAGE_STRING = mplot 1.0
+PACKAGE_TARNAME = mplot
 PACKAGE_URL = 
 PACKAGE_VERSION = 1.0
 PATH_SEPARATOR = :
@@ -231,7 +231,7 @@ target_alias =
 top_build_prefix = ../
 top_builddir = ..
 top_srcdir = ..
-mplot_SOURCES = mplot.c
+mplot_SOURCES = mplot.c mandel.c tga.c
 AM_CFLAGS = -Wall -Werror -pthread
 all: all-am
 
@@ -320,7 +320,9 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+include ./$(DEPDIR)/mandel.Po
 include ./$(DEPDIR)/mplot.Po
+include ./$(DEPDIR)/tga.Po
 
 .c.o:
 	$(AM_V_CC)$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<

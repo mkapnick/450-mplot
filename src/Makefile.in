@@ -89,7 +89,7 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
-am_mplot_OBJECTS = mplot.$(OBJEXT)
+am_mplot_OBJECTS = mplot.$(OBJEXT) mandel.$(OBJEXT) tga.$(OBJEXT)
 mplot_OBJECTS = $(am_mplot_OBJECTS)
 mplot_LDADD = $(LDADD)
 AM_V_P = $(am__v_P_@AM_V@)
@@ -231,7 +231,7 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-mplot_SOURCES = mplot.c
+mplot_SOURCES = mplot.c mandel.c tga.c
 AM_CFLAGS = -Wall -Werror -pthread
 all: all-am
 
@@ -320,7 +320,9 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mandel.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mplot.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tga.Po@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<

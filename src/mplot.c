@@ -12,7 +12,7 @@ int f_flag;
 int pflag;
 char* tgaFileName;
 int testCase;
-const int RUN_ALL_TEST_CASES = -1;
+uint8_t RUN_ALL_TEST_CASES = 100;
 
 void test(uint8_t * pixels);
 
@@ -38,12 +38,6 @@ void set_flags(int argc, char * argv[])
     // output is the name of the file to generate
     // testcase --> testcase NUMBER to run
     // pthread option, can either be 0,1,or 2
-    double testcases[][4] = {
-        { -2.00,  0.80, -1.05,  1.05 }, // test case 0
-        { -1.50, -0.30, -0.20,  0.70 }, // test case 1
-        { -0.15, -0.07,  0.85,  0.91 }, // test case 2
-        { -0.03,  0.01,  0.635, 0.665 } // test case 3
-    };
     
     aflag = 0;
     pflag = 0;
@@ -143,10 +137,6 @@ void set_flags(int argc, char * argv[])
     }
 }
 
-void test(uint8_t * pixels)
-{
-    
-}
 
 int
 main(int argc, char *argv[])
@@ -155,9 +145,9 @@ main(int argc, char *argv[])
     set_flags(argc,argv);
     
     if(aflag)
-        run_test_case (tgaFileName, (uint8_t)RUN_ALL_TEST_CASES, (uint8_t)pflag);
+        run_test_case (tgaFileName, 1, (uint8_t)pflag);
     else
-        run_test_case (tgaFileName, (uint8_t)testCase, (uint8_t)pflag);
+        run_test_case (tgaFileName, 1, (uint8_t)pflag);
     return 0;
 }
 //testing reading from binary file
