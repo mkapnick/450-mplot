@@ -19,19 +19,44 @@
 bool
 write_file (char * name, uint8_t * pic)
 {
-    uint32_t t;
-    //struct tga_header header;
-    /*printf ("pic[1][2][3] = %d\n",
-            pic + (1*WIDTH*HEIGHT) + 2*HEIGHT + 3);*/
+    printf("in write_file. Name of file is %s\n", name);
+    uint8_t (*arr)[WIDTH][HEIGHT] = (uint8_t (*)[WIDTH][HEIGHT])pic;
+    // the array is: arr[COLOR][WIDTH][HEIGHT]
+    //printf ("ptr[1][2][3] = %" PRIu8 "\n", arr[1][1000][1010]);
     
-    uint8_t (*arr)[WIDTH][HEIGHT] =
-    (uint8_t (*)[WIDTH][HEIGHT])pic;
-    t=arr[700][700][0] & 0xff;
-    printf ("ptr[1][2][3] = %" PRIu8"\n", arr[700][700][0] );
+    /*FILE *fp;
+    fp= fopen(name, "wb");
+    char x[10]="ABCDEFGHIJ";
+    printf("okokoko\n");
+    printf("x is %" PRIu8 "\n", x[7]);
+    fwrite(x, sizeof(x[0]), sizeof(x)/sizeof(x[0]), fp);*/
+    
+    //header info
+    //00  00  02  00  00  00  00  00  00  00  00  00  07  80  05  A0
+    //18  00
+    
+    
     
     FILE *fp;
     fp= fopen(name, "wb");
-    printf("finished");
+    uint8_t pixel= 0;
+    int i,j,k;
+    int count = 0;
+
+    
+    for (i =0; i < HEIGHT; i++)
+    {
+        for(j=0; j < WIDTH; j++)
+        {
+            count++;
+            for (k=0; k < 3; k++)
+            {
+                pixel = arr[k][j][i];
+                fwrite(arr, sizeof(pixel), sizeof(arr), fp);
+            }
+        }
+    }
     //fwrite (, sizeof(uint8_t), , fp);
+    printf("Count is: %i\n",count);
     return true;
 }

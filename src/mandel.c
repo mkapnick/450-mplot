@@ -59,7 +59,7 @@ void determineMandelBrotSet(double testArray [])
 {
     uint8_t pixels[HEIGHT][WIDTH][3];
     
-    uint16_t color;
+    double color;
     uint8_t blue;
     uint8_t green;
     uint8_t red;
@@ -81,7 +81,7 @@ void determineMandelBrotSet(double testArray [])
     double newa;
     double newb;
 
-    color = 0; //should this be 0?
+    color = 0; 
     xMax = 1;
     height = 0;
     width = 0;
@@ -111,22 +111,37 @@ void determineMandelBrotSet(double testArray [])
                 newb = 2 * a * b + y;
                 a=newa;
                 b=newb;
+
+                blue = 230;
+                green = 50;
+                red = 70;
+                pixels[i][j][0] = blue;
+                pixels[i][j][1] = green;
+                pixels[i][j][2] = red;
+                
             }
             //calculate the color
-            blue = (color / NUM_ITERATIONS * 180);
-            green = ( color / NUM_ITERATIONS * 255);
-            red = (color /  NUM_ITERATIONS * 120);
+            
+            if(k < 50) color = k + 50;
+            else if (k < 100) color = k + 55;
+            else if (k < 350) color = k + 80;
+            else if (k < 500) color = k + 100;
+            
+            blue = ((double)color / (double)NUM_ITERATIONS * 180);
+            green = ((double) color / (double)NUM_ITERATIONS * 255);
+            red = ((double)color /  (double)NUM_ITERATIONS * 120);
             
             pixels[i][j][0] = blue;
             pixels[i][j][1] = green;
             pixels[i][j][2] = red;
             
-            if(i == 700 && j == 700)
+            /*if(i == 780 && j == 800) //debugging statement
             {
-                printf("in if\n");
-                printf("%" PRIu8 "\n", blue );
-                printf("%" PRIu8 "\n", pixels[700][700][0] );
-            }
+                printf("printing random pixel\n");
+                printf("%" PRIu8 "\n", green);
+                printf("%" PRIu8 "\n", pixels[780][800][1] );
+            }*/
+            
             a=0;
             b=0;
             y += incrementY;
@@ -134,6 +149,6 @@ void determineMandelBrotSet(double testArray [])
         x += incrementX;
     }
     
-    printf("%i\n",count);
-    write_file(outputName, (uint8_t *) &pixels);
+    printf("Count is: %i\n",count);
+    write_file(outputName, (uint8_t *) pixels);
 }

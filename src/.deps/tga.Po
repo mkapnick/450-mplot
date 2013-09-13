@@ -12,7 +12,7 @@ tga.o tga.o: tga.c /usr/include/stdio.h /usr/include/sys/cdefs.h \
   /usr/include/string.h /usr/include/strings.h \
   /usr/include/secure/_string.h /usr/include/fcntl.h \
   /usr/include/sys/fcntl.h /usr/include/stdint.h /usr/include/sys/stat.h \
-  tga.h mplot.h
+  tga.h mplot.h /usr/include/inttypes.h
 
 /usr/include/stdio.h:
 
@@ -69,3 +69,5 @@ tga.o tga.o: tga.c /usr/include/stdio.h /usr/include/sys/cdefs.h \
 tga.h:
 
 mplot.h:
+
+/usr/include/inttypes.h:
