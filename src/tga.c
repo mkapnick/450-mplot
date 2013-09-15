@@ -21,42 +21,37 @@ write_file (char * name, uint8_t * pic)
 {
     printf("in write_file. Name of file is %s\n", name);
     uint8_t (*arr)[WIDTH][HEIGHT] = (uint8_t (*)[WIDTH][HEIGHT])pic;
-    // the array is: arr[COLOR][WIDTH][HEIGHT]
-    //printf ("ptr[1][2][3] = %" PRIu8 "\n", arr[1][1000][1010]);
-    
-    /*FILE *fp;
-    fp= fopen(name, "wb");
-    char x[10]="ABCDEFGHIJ";
-    printf("okokoko\n");
-    printf("x is %" PRIu8 "\n", x[7]);
-    fwrite(x, sizeof(x[0]), sizeof(x)/sizeof(x[0]), fp);*/
-    
-    //header info
-    //00  00  02  00  00  00  00  00  00  00  00  00  07  80  05  A0
-    //18  00
-    
-    
-    
     FILE *fp;
     fp= fopen(name, "wb");
-    uint8_t pixel= 0;
-    int i,j,k;
-    int count = 0;
-
     
-    for (i =0; i < HEIGHT; i++)
-    {
-        for(j=0; j < WIDTH; j++)
-        {
-            count++;
-            for (k=0; k < 3; k++)
-            {
-                pixel = arr[k][j][i];
-                fwrite(arr, sizeof(pixel), sizeof(arr), fp);
-            }
-        }
-    }
-    //fwrite (, sizeof(uint8_t), , fp);
-    printf("Count is: %i\n",count);
+    printf("size of array is: %li\n", sizeof(arr));
+    
+    struct tga_header header;
+    header.id_length = 0;
+    header.cmap_type = 0;
+    header.img_type = 2;
+    header.cmap_spec[0] = 0;
+    header.cmap_spec[1] = 0;
+    header.cmap_spec[2] = 0;
+    header.cmap_spec[3] = 0;
+    header.cmap_spec[4] = 0;
+    header.img_spec[0] = 0;
+    header.img_spec[1] = 0;
+    header.img_spec[2] = 0;
+    header.img_spec[3] = 0;
+    header.img_spec[4] = 0x80;
+    header.img_spec[5] = 7;
+    header.img_spec[6] = 0xA0;
+    header.img_spec[7] = 5;
+    header.img_spec[8] = 0x18;
+    header.img_spec[9] = 0;
+    
+    printf("HEIGHT * WIDTH IS: %i\n", HEIGHT * WIDTH);
+    
+    printf("size of header is: %li\n", sizeof(header));
+    fwrite(&header, sizeof(uint8_t) , sizeof(header),fp);
+    size_t size = fwrite(arr, sizeof(arr), HEIGHT * WIDTH, fp);
+    printf("size of file is %zi\n", size);
+    
     return true;
 }

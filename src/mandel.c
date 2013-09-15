@@ -17,6 +17,8 @@ const int NUM_ITERATIONS = 500;
 const int TEST_CASE_MAX_INDEX = 4;
 char * outputName;
 
+void calculate_pixels(double * x,double * y, double * endx, double * endy);
+
 
 /* The main entry point into the Mandelbrot set calculation. The parameters
  * to this function consist of the name of the file to generate (output), the
@@ -57,98 +59,85 @@ run_test_case (char * output, uint8_t testcase, uint8_t pthreads)
 
 void determineMandelBrotSet(double testArray [])
 {
-    uint8_t pixels[HEIGHT][WIDTH][3];
     
-    double color;
-    uint8_t blue;
-    uint8_t green;
-    uint8_t red;
+    /* declarations */ 
+    double x,y,endx,endy;
     
-    int i =0;
-    int j =0;
-    int k =0;
-    
-    int xMax;
-    int height;
-    int width;
-    
-    double x;
-    double y;
-    double endx;
-    double endy;
-    double a;
-    double b;
-    double newa;
-    double newb;
-
-    color = 0; 
-    xMax = 1;
-    height = 0;
-    width = 0;
-    
+    /* assignments */
     x =  testArray[0];
     y = testArray[1];
     endx = testArray[2];
     endy = testArray[3];
     
-    a = 0;
-    b = 0;
-    newa = 0;
-    newb = 0;
-    int count = 0;
+    /* debugging */
+    printf("x is: %f\n", x);
+    printf("y is: %f\n", y);
+    printf("endx is: %f\n", endx);
+    printf("endy is: %f\n", endy);
     
-    double incrementX = x + ((endx - x) / HEIGHT);
-    double incrementY = y + ((endy - y) / WIDTH);
+    /* Calculate mandelbrot set */
+    calculate_pixels(&x,&y,&endx,&endy);
+}
+
+void calculate_pixels( double * x, double * y, double *endx, double * endy)
+{
+    /* declarations */
+    uint8_t pixels[HEIGHT][WIDTH][3], blue,green,red;
+    double incrementX, incrementY, firstX,color,a,b,newa,newb;
+    int i, j,k,count;
     
+    /* assignments */
+    incrementX = ((*endx - *x) / WIDTH);
+    incrementY = ((*endy - *y) / HEIGHT);
+    firstX = *x;
+    count = 0;
+    
+    /* Figure out color for each individual pixel in/out of mandelbrot set */
     for (i=0; i < HEIGHT; i++)
     {
         for (j =0; j < WIDTH; j++)
         {
-            for (k =0; k < NUM_ITERATIONS && a*a+b*b < 100; k++)
+            for (k =0; a*a+b*b < 100 && k < NUM_ITERATIONS; k++) //magnitude of the orbit point
             {
-                count++;
-                newa = a * a - b * b + x;
-                newb = 2 * a * b + y;
+                newa = a * a - b * b + *x;
+                newb = 2 * a * b + *y;
                 a=newa;
                 b=newb;
-
+                count++;
+            }
+            
+            if(a*a + b*b < 100)
+            {
                 blue = 230;
                 green = 50;
                 red = 70;
-                pixels[i][j][0] = blue;
-                pixels[i][j][1] = green;
-                pixels[i][j][2] = red;
-                
             }
-            //calculate the color
-            
-            if(k < 50) color = k + 50;
-            else if (k < 100) color = k + 55;
-            else if (k < 350) color = k + 80;
-            else if (k < 500) color = k + 100;
-            
-            blue = ((double)color / (double)NUM_ITERATIONS * 180);
-            green = ((double) color / (double)NUM_ITERATIONS * 255);
-            red = ((double)color /  (double)NUM_ITERATIONS * 120);
-            
+            else
+            {
+                if(k < 50) color = k + 50;
+                else if (k < 100) color = k + 55;
+                else if (k < 350) color = k + 80;
+                else if (k < 400) color = k + 90;
+                else if (k < 500) color = k + (499 -k);
+                
+                blue = (color / (double)NUM_ITERATIONS * 180);
+                green = ( color / (double)NUM_ITERATIONS * 255);
+                red = (color /  (double)NUM_ITERATIONS * 120);
+            }
             pixels[i][j][0] = blue;
             pixels[i][j][1] = green;
             pixels[i][j][2] = red;
-            
-            /*if(i == 780 && j == 800) //debugging statement
-            {
-                printf("printing random pixel\n");
-                printf("%" PRIu8 "\n", green);
-                printf("%" PRIu8 "\n", pixels[780][800][1] );
-            }*/
-            
+     
             a=0;
             b=0;
-            y += incrementY;
+            *x = *x + incrementX;
         }
-        x += incrementX;
+        *y = *y + incrementY;
+        *x = firstX;
     }
     
-    printf("Count is: %i\n",count);
-    write_file(outputName, (uint8_t *) pixels);
+    //printf("count is: %i\n", count);
+    
+    /* Write pixels to binary file */
+    write_file(outputName, (uint8_t *)pixels);
 }
