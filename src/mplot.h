@@ -9,6 +9,7 @@ double testcases[][4] = {
     { -0.03,  0.01,  0.635, 0.665 } // test case 3
 };
 
+
 #endif
 
 #ifndef __SET_FLAGS__
@@ -17,7 +18,6 @@ double testcases[][4] = {
 void set_flags(int argc, char * argv[]);
 
 #endif
-
 
 #define MAX_TEST_CASE 3
 #define WIDTH 1920

@@ -10,5 +10,6 @@ struct tga_header {
     uint8_t img_spec[10];
 };
 
+void construct_header(struct tga_header *);
 bool write_file (char * name, uint8_t * pic);
 #endif

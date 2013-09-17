@@ -17,7 +17,8 @@ const int NUM_ITERATIONS = 500;
 const int TEST_CASE_MAX_INDEX = 4;
 char * outputName;
 
-void calculate_pixels(double * x,double * y, double * endx, double * endy);
+uint8_t pixels [HEIGHT][WIDTH][3];
+double x,y,endx,endy, incrementX, incrementY;
 
 
 /* The main entry point into the Mandelbrot set calculation. The parameters
@@ -33,9 +34,10 @@ run_test_case (char * output, uint8_t testcase, uint8_t pthreads)
     double testArray[4];
     outputName = output;
     
-    if((int)testcase == 100)
+    if(testcase == 100)
     {
         //run all test cases
+        //while loop and for loop
         
     }
     else if (testcase < TEST_CASE_MAX_INDEX)
@@ -46,7 +48,21 @@ run_test_case (char * output, uint8_t testcase, uint8_t pthreads)
         {
             testArray[i] = testcases[testcase][i];
         }
-        determineMandelBrotSet(testArray);
+        
+        /* initialized test array, now determine mandelbrot set */
+        if (pthreads == 1)
+        {
+        
+        }
+        
+        else if (pthreads == 2)
+        {
+            
+        }
+        else
+        {
+            determineMandelBrotSet(testArray);
+        }
     }
     else
     {
@@ -54,20 +70,34 @@ run_test_case (char * output, uint8_t testcase, uint8_t pthreads)
         exit(EXIT_FAILURE);
     }
     
-    printf ("\nRun a test case and produce file %s\n", output);
+    printf ("\nFinished\n");
 }
 
-void determineMandelBrotSet(double testArray [])
+/**************************************
+ *
+ **************************************/
+
+void * determineMandelBrotSet(double testArray [])
 {
     
     /* declarations */ 
-    double x,y,endx,endy;
+    
     
     /* assignments */
     x =  testArray[0];
-    y = testArray[1];
-    endx = testArray[2];
+    y = testArray[2];
+    endx = testArray[1];
     endy = testArray[3];
+    
+    if ((x >0 && endx > 0) || (x <0 && endx < 0))
+        incrementX = fabs(fabs(endx) - fabs(x) ) / (double)WIDTH;
+    else
+        incrementX = (fabs(endx) + fabs(x)) / (double)WIDTH;
+    
+    if ((y >0 && endy > 0) || (y <0 && endy < 0))
+        incrementY = fabs(fabs(endy) - fabs(y)) / (double)HEIGHT;
+    else
+        incrementY = (fabs(endy) + fabs(y)) / (double)HEIGHT;
     
     /* debugging */
     printf("x is: %f\n", x);
@@ -75,69 +105,132 @@ void determineMandelBrotSet(double testArray [])
     printf("endx is: %f\n", endx);
     printf("endy is: %f\n", endy);
     
-    /* Calculate mandelbrot set */
-    calculate_pixels(&x,&y,&endx,&endy);
+    /* Calculate pixel color based on algorithm */
+    calculate_pixels();
+    
+    return 0;
+    
 }
 
-void calculate_pixels( double * x, double * y, double *endx, double * endy)
+/**************************************
+ *
+ **************************************/
+
+void calculate_pixels()
 {
     /* declarations */
-    uint8_t pixels[HEIGHT][WIDTH][3], blue,green,red;
-    double incrementX, incrementY, firstX,color,a,b,newa,newb;
-    int i, j,k,count;
+    double firstX;
+    int i,j;
+    struct colorpixels cp;
     
     /* assignments */
-    incrementX = ((*endx - *x) / WIDTH);
-    incrementY = ((*endy - *y) / HEIGHT);
-    firstX = *x;
-    count = 0;
+    firstX = x;
     
-    /* Figure out color for each individual pixel in/out of mandelbrot set */
+    printf("increment x is: %f\n", incrementX);
+    printf("increment y is: %f\n", incrementY);
+    
     for (i=0; i < HEIGHT; i++)
     {
         for (j =0; j < WIDTH; j++)
         {
-            for (k =0; a*a+b*b < 100 && k < NUM_ITERATIONS; k++) //magnitude of the orbit point
-            {
-                newa = a * a - b * b + *x;
-                newb = 2 * a * b + *y;
-                a=newa;
-                b=newb;
-                count++;
-            }
-            
-            if(a*a + b*b < 100)
-            {
-                blue = 230;
-                green = 50;
-                red = 70;
-            }
-            else
-            {
-                if(k < 50) color = k + 50;
-                else if (k < 100) color = k + 55;
-                else if (k < 350) color = k + 80;
-                else if (k < 400) color = k + 90;
-                else if (k < 500) color = k + (499 -k);
-                
-                blue = (color / (double)NUM_ITERATIONS * 180);
-                green = ( color / (double)NUM_ITERATIONS * 255);
-                red = (color /  (double)NUM_ITERATIONS * 120);
-            }
-            pixels[i][j][0] = blue;
-            pixels[i][j][1] = green;
-            pixels[i][j][2] = red;
-     
-            a=0;
-            b=0;
-            *x = *x + incrementX;
+            find_color(&cp);
+            pixels[i][j][0] = cp.blue;
+            pixels[i][j][1] = cp.green;
+            pixels[i][j][2] = cp.red;
+            x = x + incrementX;
         }
-        *y = *y + incrementY;
-        *x = firstX;
+        y = y + incrementY;
+        x = firstX;
     }
-    
-    //printf("count is: %i\n", count);
-    
     /* Write pixels to binary file */
     write_file(outputName, (uint8_t *)pixels);
 }
+
+
+/**************************************
+ *
+ **************************************/
+
+void calculate_per_row()
+{
+    /* declarations */
+    double firstX;
+    long i;
+    
+    /* assignments */
+    firstX = x;
+    
+    pthread_t threads[HEIGHT];
+    int rc;
+    
+    /*for (i=0; i < HEIGHT; i++)
+    {
+        for (j =0; j < WIDTH; j++)
+        {
+            rc = pthread_create(&threads[i], NULL,loop_through_width((int)i),(void *)i);
+            //find_color(&cp); --> call this function in thread
+            pixels[i][j][0] = cp.blue;
+            pixels[i][j][1] = cp.green;
+            pixels[i][j][2] = cp.red;
+            x = x + incrementX;
+        }
+     y = y + incrementY;
+     x = firstX;
+    }*/
+    
+    printf("real end y is %f\n", y);
+    pthread_exit(NULL);    
+    write_file(outputName, (uint8_t *)pixels);
+}
+
+/**************************************
+ *
+ **************************************/
+
+void find_color(struct colorpixels * cp)
+{
+    int k;
+    uint8_t blue,green,red;
+    double a,b,newa,newb, color;
+    
+    a=0;
+    b=0;
+    color = 0;
+    
+    for (k =0; a*a+b*b < 100 && k < NUM_ITERATIONS; k++) //magnitude of the orbit point
+    {
+        newa = a * a - b * b + x;
+        newb = 2 * a * b + y;
+        a=newa;
+        b=newb;
+    }
+    
+    if(a*a + b*b < 100)
+    {
+        blue = 230;
+        green = 50;
+        red = 70;
+    }
+    else
+    {
+        if(k < 50) color = k + 50;
+        else if (k < 100) color = k + 55;
+        else if (k < 350) color = k + 80;
+        else if (k < 400) color = k + 90;
+        else color = k + (499 -k);
+        
+        blue = (color / (double)NUM_ITERATIONS * 180);
+        green = ( color / (double)NUM_ITERATIONS * 255);
+        red = (color /  (double)NUM_ITERATIONS * 120);
+    }
+    
+    cp->blue = blue;
+    cp->green = green;
+    cp->red = red;
+    
+    //printf("blue is: %f\n", (double)blue);
+   // printf("green is: %f\n", green);
+   // printf("red is: %f\n", red);
+}
+
+

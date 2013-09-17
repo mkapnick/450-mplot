@@ -19,7 +19,8 @@ mplot.o mplot.o: mplot.c /usr/include/stdio.h /usr/include/sys/cdefs.h \
   /usr/include/sys/_endian.h /usr/include/libkern/_OSByteOrder.h \
   /usr/include/libkern/i386/_OSByteOrder.h /usr/include/alloca.h \
   /usr/include/machine/types.h /usr/include/i386/types.h \
-  /usr/include/i386/_types.h mplot.h mandel.h
+  /usr/include/i386/_types.h mplot.h mandel.h /usr/include/ctype.h \
+  /usr/include/runetype.h
 
 /usr/include/stdio.h:
 
@@ -106,3 +107,7 @@ mplot.o mplot.o: mplot.c /usr/include/stdio.h /usr/include/sys/cdefs.h \
 mplot.h:
 
 mandel.h:
+
+/usr/include/ctype.h:
+
+/usr/include/runetype.h:

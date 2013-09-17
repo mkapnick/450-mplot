@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include "mplot.h"
 #include "mandel.h"
+#include <ctype.h>
 
 int aflag;
 int f_flag;
@@ -14,10 +15,9 @@ char* tgaFileName;
 int testCase;
 uint8_t RUN_ALL_TEST_CASES = 100;
 
-void test(uint8_t * pixels);
 
-void
-show_usage (void)
+
+void show_usage (void)
 {
     printf ("Usage: mplot [options]\n");
     printf ("Options:\n");
@@ -34,14 +34,9 @@ show_usage (void)
 
 void set_flags(int argc, char * argv[])
 {
-    // * PARAMS *
-    // output is the name of the file to generate
-    // testcase --> testcase NUMBER to run
-    // pthread option, can either be 0,1,or 2
-    
     aflag = 0;
     pflag = 0;
-    tgaFileName = "out.tga"; //default file name
+    tgaFileName = "mandelbrot.tga"; //default file name
     testCase = 0; //default test case
     
     int c;
@@ -65,11 +60,7 @@ void set_flags(int argc, char * argv[])
             }
             else
             {
-                // run all test cases
-                /*for (test = 0; test < 4; test++)
-                 {
-                 printf(" in loop -- %.2f\nt", testcases[0][test]);
-                 }*/
+                testCase = 100; // flag for running all test cases
             }
             
             aflag = 1;
@@ -118,7 +109,16 @@ void set_flags(int argc, char * argv[])
                 fprintf(stderr, "flag -a is incompatible with -t. Aborting" );
                 exit(EXIT_FAILURE);
             }
-            testCase = atoi(argv[ optind -1]);
+            //if(isdigit(atoi(argv[optind -1])))
+            //{
+                testCase = atoi(argv[ optind -1]);
+            //}
+            //else
+            //{
+               // fprintf(stderr, "Must provide valid test case number. Exiting program");
+                //exit(EXIT_FAILURE);
+                
+            //}
             break;
             
         case '?':
@@ -137,52 +137,12 @@ void set_flags(int argc, char * argv[])
     }
 }
 
-
-int
-main(int argc, char *argv[])
+int main(int argc, char *argv[])
 {
     //show_usage ();
     set_flags(argc,argv);
+    printf("testcase is: %i\n", testCase);
+    run_test_case (tgaFileName, testCase, pflag);
     
-    if(aflag)
-        run_test_case (tgaFileName, 1, (uint8_t)pflag);
-    else
-        run_test_case (tgaFileName, 1, (uint8_t)pflag);
     return 0;
 }
-//testing reading from binary file
-/*FILE *fp;
- long lSize;
- size_t result;
- char * output = "result.tga";
- char * buffer;
- char * file = "test2.txt";
- uint8_t pixels[HEIGHT][WIDTH][3];
- 
- fp=fopen(file, "r");
- 
- system("pwd");
- if (fp==NULL)
- {
- fputs ("File error",stderr);
- exit (1);
- }
- 
- //size of file
- fseek (fp,0,SEEK_END);
- lSize = ftell(fp);
- rewind(fp);
- 
- // allocate memory to contain the whole file:
- buffer = (char *) malloc (sizeof (char *)*lSize);
- if (buffer == NULL)
- {
- fputs ("Memory error",stderr);
- exit (2);
- }
- result = fread(buffer,1,lSize,fp);
- if (result != lSize)
- {
- fputs ("Reading error",stderr);
- exit (3);
- }*/
