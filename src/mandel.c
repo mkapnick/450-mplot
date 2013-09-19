@@ -18,7 +18,7 @@ const int TEST_CASE_MAX_INDEX = 4;
 char * outputName;
 
 uint8_t pixels [HEIGHT][WIDTH][3];
-double x,y,endx,endy, incrementX, incrementY;
+double x,y,endx,endy, incrementX, incrementY, firstX;
 
 
 /* The main entry point into the Mandelbrot set calculation. The parameters
@@ -38,6 +38,17 @@ run_test_case (char * output, uint8_t testcase, uint8_t pthreads)
     {
         //run all test cases
         //while loop and for loop
+        int count,j;
+        count = 0;
+        do
+        {
+            for (j =0; j < 4; j++)
+            {
+                testArray[j] = testcases[count][j];
+            }
+            count++;
+            determineMandelBrotSet(testArray);
+        } while (count < 4);
         
     }
     else if (testcase < TEST_CASE_MAX_INDEX)
@@ -52,17 +63,19 @@ run_test_case (char * output, uint8_t testcase, uint8_t pthreads)
         /* initialized test array, now determine mandelbrot set */
         if (pthreads == 1)
         {
-        
+            printf("here");
+            determineMandelBrotSet(testArray);
+            calculate_per_row();
         }
         
         else if (pthreads == 2)
         {
-            
+            // can't do
         }
         else
         {
-            calculate_per_row();
-            //determineMandelBrotSet(testArray);
+            determineMandelBrotSet(testArray);
+            calculate_pixels();
         }
     }
     else
@@ -80,15 +93,12 @@ run_test_case (char * output, uint8_t testcase, uint8_t pthreads)
 
 void * determineMandelBrotSet(double testArray [])
 {
-    
-    /* declarations */ 
-    
-    
     /* assignments */
     x =  testArray[0];
     y = testArray[2];
     endx = testArray[1];
     endy = testArray[3];
+    firstX = x;
     
     if ((x >0 && endx > 0) || (x <0 && endx < 0))
         incrementX = fabs(fabs(endx) - fabs(x) ) / (double)WIDTH;
@@ -107,7 +117,6 @@ void * determineMandelBrotSet(double testArray [])
     printf("endy is: %f\n", endy);
     
     /* Calculate pixel color based on algorithm */
-    calculate_pixels();
     
     return 0;
     
@@ -120,12 +129,11 @@ void * determineMandelBrotSet(double testArray [])
 void calculate_pixels()
 {
     /* declarations */
-    double firstX;
     int i,j;
     struct colorpixels cp;
     
     /* assignments */
-    firstX = x;
+
     
     printf("increment x is: %f\n", incrementX);
     printf("increment y is: %f\n", incrementY);
@@ -155,12 +163,10 @@ void calculate_pixels()
 void calculate_per_row()
 {
     /* declarations */
-    double firstX;
     long i;
     void * status;
     
     /* assignments */
-    firstX = x;
     
     pthread_t threads[HEIGHT];
     pthread_attr_t attr;
@@ -171,13 +177,13 @@ void calculate_per_row()
     
     for (i=0; i < HEIGHT; i++)
     {
-        rc = pthread_create(&threads[i], &attr, width_and_color, (void *)i);
+        rc = pthread_create(&threads[i], &attr, width_and_color, &i);
     }
     pthread_attr_destroy(&attr);
     long t;
-    for(t=0; t<HEIGHT; t++) {
+    for(t=0; t<HEIGHT; t++)
+    {
         rc = pthread_join(threads[t], &status);
-        x = firstX;
         if (rc)
         {
             printf("ERROR; return code from pthread_join() is %d\n", rc);
@@ -194,7 +200,8 @@ void calculate_per_row()
 
 void * width_and_color(void * ii)
 {
-    int i = (int) ii;
+    int i = (int) (long)ii;
+
     struct colorpixels cp;
     int j;
     
@@ -207,6 +214,7 @@ void * width_and_color(void * ii)
         x = x + incrementX;
     }
     y = y + incrementY;
+    x = firstX;
     
     return 0;
 }
