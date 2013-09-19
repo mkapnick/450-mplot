@@ -61,7 +61,8 @@ run_test_case (char * output, uint8_t testcase, uint8_t pthreads)
         }
         else
         {
-            determineMandelBrotSet(testArray);
+            calculate_per_row();
+            //determineMandelBrotSet(testArray);
         }
     }
     else
@@ -156,30 +157,34 @@ void calculate_per_row()
     /* declarations */
     double firstX;
     long i;
+    void * status;
     
     /* assignments */
     firstX = x;
     
     pthread_t threads[HEIGHT];
+    pthread_attr_t attr;
     int rc;
     
-    /*for (i=0; i < HEIGHT; i++)
-    {
-        for (j =0; j < WIDTH; j++)
-        {
-            rc = pthread_create(&threads[i], NULL,loop_through_width((int)i),(void *)i);
-            //find_color(&cp); --> call this function in thread
-            pixels[i][j][0] = cp.blue;
-            pixels[i][j][1] = cp.green;
-            pixels[i][j][2] = cp.red;
-            x = x + incrementX;
-        }
-     y = y + incrementY;
-     x = firstX;
-    }*/
+    pthread_attr_init(&attr);
+    pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
     
-    printf("real end y is %f\n", y);
-    pthread_exit(NULL);    
+    for (i=0; i < HEIGHT; i++)
+    {
+        rc = pthread_create(&threads[i], &attr, width_and_color, (void *)i);
+    }
+    pthread_attr_destroy(&attr);
+    long t;
+    for(t=0; t<HEIGHT; t++) {
+        rc = pthread_join(threads[t], &status);
+        x = firstX;
+        if (rc)
+        {
+            printf("ERROR; return code from pthread_join() is %d\n", rc);
+            exit(-1);
+        }
+        printf("Main: completed join with thread %ld having a status of %ld\n",t,(long)status);
+    }
     write_file(outputName, (uint8_t *)pixels);
 }
 
@@ -187,8 +192,29 @@ void calculate_per_row()
  *
  **************************************/
 
-void find_color(struct colorpixels * cp)
+void * width_and_color(void * ii)
 {
+    int i = (int) ii;
+    struct colorpixels cp;
+    int j;
+    
+    for (j =0; j < WIDTH; j++)
+    {
+        find_color(&cp);
+        pixels[i][j][0] = cp.blue;
+        pixels[i][j][1] = cp.green;
+        pixels[i][j][2] = cp.red;
+        x = x + incrementX;
+    }
+    y = y + incrementY;
+    
+    return 0;
+}
+
+void * find_color(void * cp2)
+{
+    struct colorpixels *cp;
+    cp = (struct colorpixels *) cp2;
     int k;
     uint8_t blue,green,red;
     double a,b,newa,newb, color;
@@ -231,6 +257,7 @@ void find_color(struct colorpixels * cp)
     //printf("blue is: %f\n", (double)blue);
    // printf("green is: %f\n", green);
    // printf("red is: %f\n", red);
+    return 0;
 }
 
 

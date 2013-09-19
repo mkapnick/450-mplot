@@ -30,10 +30,7 @@ bool write_file (char * name, uint8_t * pic)
     /* construct header */
     struct tga_header header;
     construct_header(&header);
-    
-    //printf("HEIGHT * WIDTH IS: %i\n", HEIGHT * WIDTH);
-    //printf("size of header is: %li\n", sizeof(header));
-    
+
     /* Write to binary file */
     fwrite(&header, sizeof(uint8_t) , sizeof(header),fp);
     size_t size = fwrite(arr, sizeof(arr), HEIGHT * WIDTH, fp);
