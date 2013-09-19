@@ -25,7 +25,6 @@ bool write_file (char * name, uint8_t * pic)
     FILE *fp;
     
     fp= fopen(name, "wb");
-    printf("size of array is: %li\n", sizeof(arr));
     
     /* construct header */
     struct tga_header header;
