@@ -13,15 +13,13 @@
 #include <inttypes.h>
 
 /* You can tweak this parameter if you wish, but you should not need to. */
+char * strcat ( char * destination, const char * source );
 const int NUM_ITERATIONS = 500;
-const int TEST_CASE_MAX_INDEX = 4;
+const int TEST_CASE_MAX_INDEX = 7;
 char * outputName;
 
 uint8_t pixels [HEIGHT][WIDTH][3];
 double x,y,endx,endy, incrementX, incrementY, firstX;
-
-char * strcat ( char * destination, const char * source );
-struct info original;
 
 struct info {
     double x;
@@ -34,6 +32,8 @@ struct info {
     long height;
     int width;
 };
+struct info original;
+
 
 
 /* The main entry point into the Mandelbrot set calculation. The parameters
@@ -46,7 +46,7 @@ struct info {
 void
 run_test_case (char * output, uint8_t testcase, uint8_t pthreads, int length_of_file)
 {
-    double testArray[4];
+    double testArray[5];
     outputName = output;
     
     if(testcase == 100)
@@ -83,7 +83,7 @@ run_test_case (char * output, uint8_t testcase, uint8_t pthreads, int length_of_
         if (pthreads == 1)
         {
             printf("\n| ----- Multithreaded program ----- | \n\n");
-            determineMandelBrotSet2(testArray);
+            determineMandelBrotSet(testArray);
             calculate_per_row();
         }
         
@@ -108,46 +108,12 @@ run_test_case (char * output, uint8_t testcase, uint8_t pthreads, int length_of_
     printf ("\nFinished\n");
 }
 
+
 /**************************************
  *
  **************************************/
 
 void * determineMandelBrotSet(double testArray [])
-{
-    /* assignments */
-    x =  testArray[0];
-    y = testArray[2];
-    endx = testArray[1];
-    endy = testArray[3];
-    firstX = x;
-    
-    if ((x >0 && endx > 0) || (x <0 && endx < 0))
-        incrementX = fabs(fabs(endx) - fabs(x) ) / (double)WIDTH;
-    else
-        incrementX = (fabs(endx) + fabs(x)) / (double)WIDTH;
-    
-    if ((y >0 && endy > 0) || (y <0 && endy < 0))
-        incrementY = fabs(fabs(endy) - fabs(y)) / (double)HEIGHT;
-    else
-        incrementY = (fabs(endy) + fabs(y)) / (double)HEIGHT;
-    
-    /* debugging */
-    printf("x is: %f\n", x);
-    printf("y is: %f\n", y);
-    printf("endx is: %f\n", endx);
-    printf("endy is: %f\n", endy);
-    
-    /* Calculate pixel color based on algorithm */
-    
-    return 0;
-    
-}
-
-/**************************************
- *
- **************************************/
-
-void * determineMandelBrotSet2(double testArray [])
 {
     /* assignments */
     original.x =  testArray[0];
@@ -191,22 +157,21 @@ void calculate_pixels()
     
     /* assignments */
 
-    
-    printf("increment x is: %f\n", incrementX);
-    printf("increment y is: %f\n", incrementY);
+    printf("increment x is: %f\n", original.incrementX);
+    printf("increment y is: %f\n", original.incrementY);
     
     for (i=0; i < HEIGHT; i++)
     {
         for (j =0; j < WIDTH; j++)
         {
-            //find_color(&cp);
+            find_color(&cp, &original);
             pixels[i][j][0] = cp.blue;
             pixels[i][j][1] = cp.green;
             pixels[i][j][2] = cp.red;
-            x = x + incrementX;
+            original.x = original.x + original.incrementX;
         }
-        y = y + incrementY;
-        x = firstX;
+        original.y = original.y + original.incrementY;
+        original.x = original.firstX;
     }
     /* Write pixels to binary file */
     write_file(outputName, (uint8_t *)pixels);
